@@ -64,4 +64,10 @@ public abstract class TestParsingShort {
 		String args[] = "-e".split(" ");
 		cliOptions.parse(args);
 	}
+
+	@Test(expected=CliSyntaxException.class)
+	public void  OptionDMultipleVaues()  throws Exception {
+		String args[] = "-d aaa -d bbb".split(" ");
+		cliOptions.parse(args);
+	}
 }
