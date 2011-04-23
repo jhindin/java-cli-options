@@ -156,8 +156,8 @@ public class CliOptions {
 				if (o.length() == 1) {
 					throw new OptionsSyntaxException(o);
 				}
-				o = o.substring(0, o.length() - 1);
 				allowMutipleValues = o.endsWith("#");
+				o = o.substring(0, o.length() - 1);
 			}
 			for (char c : o.toCharArray()) {
 				if (!Character.isLetter(c)) {
