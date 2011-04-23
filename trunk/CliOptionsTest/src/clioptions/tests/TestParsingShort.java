@@ -1,9 +1,12 @@
 package clioptions.tests;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +16,7 @@ import clioptions.CliSyntaxException;
 import clioptions.OptionsSyntaxException;
 
 
-public abstract class TestParsingShort {
+public  class TestParsingShort {
 	CliOptions cliOptions;
 	
 	@Before
@@ -66,8 +69,28 @@ public abstract class TestParsingShort {
 	}
 
 	@Test(expected=CliSyntaxException.class)
+	public void  OptionEA()  throws Exception {
+		String args[] = "-ae tyu".split(" ");
+		cliOptions.parse(args);
+	}
+
+	@Test(expected=CliSyntaxException.class)
 	public void  OptionDMultipleVaues()  throws Exception {
 		String args[] = "-d aaa -d bbb".split(" ");
 		cliOptions.parse(args);
 	}
+
+	@Test 
+	public void  MultipleOptionValues()  throws Exception {
+		String args[] = "-a -d asd -e ght -e bnm abc def".split(" ");
+		cliOptions.parse(args);
+		String rargs[] = cliOptions.getRemaningArgs();
+		assertArrayEquals("abc def".split(" "), rargs);
+		assertTrue(cliOptions.isOptionSet("a"));
+		assertFalse(cliOptions.isOptionSet("b"));
+		assertEquals("asd", cliOptions.getOptionValue("d"));
+		assertEquals("ght", cliOptions.getOptionValue("e"));
+		assertEquals(Arrays.asList("ght", "bnm"), cliOptions.getAllOptionValues("e"));
+	}
+
 }
