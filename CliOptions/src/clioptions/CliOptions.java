@@ -7,6 +7,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import clioptions.exceptions.creation.LongOptionException;
+import clioptions.exceptions.creation.OptionException;
+import clioptions.exceptions.creation.ShortOptionsException;
+import clioptions.exceptions.parsing.MixedOptionParsingException;
+import clioptions.exceptions.parsing.MultipleOptionValuesException;
+import clioptions.exceptions.parsing.NoArgumentParsingException;
+import clioptions.exceptions.parsing.ParsingException;
+import clioptions.exceptions.parsing.SingleDashParsingException;
+import clioptions.exceptions.parsing.UnknownOptionParsingException;
+
+
+
+
 /** CliOptions is a class providing Unix-like CLI options parsing.
  * 
  * <p>The class has several constructors, accepting short option descriptor string and long 
@@ -37,26 +50,26 @@ public class CliOptions {
 
 	/**
 	 * Class constructor accepting short option descriptor string.
-	 * @throws OptionsSyntaxException
+	 * @throws OptionException
 	 */
 
-	public CliOptions(String shortOptions) throws OptionsSyntaxException {
+	public CliOptions(String shortOptions) throws OptionException {
 		parseShortOptionsString(shortOptions);
 	}
 
 	/**
 	 * Class constructor accepting long options descriptors as array.
-	 * @throws OptionsSyntaxException
+	 * @throws OptionException
 	 */
-	public CliOptions(String longOptions[]) throws OptionsSyntaxException {
+	public CliOptions(String longOptions[]) throws OptionException {
 		fillLongOptions(longOptions);
 	}
 
 	/**
 	 * Class constructor accepting long options descriptors as List.
-	 * @throws OptionsSyntaxException
+	 * @throws OptionException
 	 */
-	public CliOptions(List<String> longOptions) throws OptionsSyntaxException {
+	public CliOptions(List<String> longOptions) throws OptionException {
 		String o[] = new String[longOptions.size()];
 		o = longOptions.toArray(o);
 		fillLongOptions(o);
@@ -64,20 +77,20 @@ public class CliOptions {
 
 	/**
 	 * Class constructor accepting short options descriptor string and long options descriptors as array.
-	 * @throws OptionsSyntaxException
+	 * @throws OptionException
 	 */
 	public CliOptions(String shortOptions, String longOptions[])
-			throws OptionsSyntaxException {
+			throws OptionException {
 		parseShortOptionsString(shortOptions);
 		fillLongOptions(longOptions);
 	}
 
 	/**
 	 * Class constructor accepting short options descriptor string and long options descriptors as list.
-	 * @throws OptionsSyntaxException
+	 * @throws OptionException
 	 */
 	public CliOptions(String shortOptions, List<String> longOptions)
-			throws OptionsSyntaxException {
+			throws OptionException {
 		parseShortOptionsString(shortOptions);
 
 		String o[] = new String[longOptions.size()];
@@ -87,19 +100,19 @@ public class CliOptions {
 
 	/**
 	 * Parsing command line; encountered options are accumulated internally for later querying.
-	 * @throws CliSyntaxException
+	 * @throws ParsingException
 	 */
-	public void parse(String args[]) throws CliSyntaxException {
+	public void parse(String args[]) throws ParsingException {
 		parse(args, null);
 	}
 
 	/**
 	 * Parsing command line; encountered options are accumulated internally for later querying, with
 	 * listener. One of CliOptionsListener methods is invoked on each successfully recognized option.
-	 * @throws CliSyntaxException
+	 * @throws ParsingException
 	 */
 	public void parse(String args[], CliOptionsListener listener)
-			throws CliSyntaxException {
+			throws ParsingException {
 
 		remainingArgs = null;
 		optionsValues = new HashMap<String, List<String>>();
@@ -108,7 +121,7 @@ public class CliOptions {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].charAt(0) == '-') {
 				if (args[i].length() == 1)
-					throw new CliSyntaxException("single - argument");
+					throw new SingleDashParsingException();
 
 				if (args[i].equals("--")) {
 					remainingArgs = Arrays
@@ -120,13 +133,11 @@ public class CliOptions {
 					String longOption = args[i].substring(2);
 					Option o = longOptionsMap.get(longOption);
 					if (o == null)
-						throw new CliSyntaxException("unknown option "
-								+ longOption);
+						throw new UnknownOptionParsingException(longOption);
 
 					if (o.requireValue) {
 						if (i == (args.length - 1))
-							throw new CliSyntaxException("option " + longOption
-									+ " without argument");
+							throw new NoArgumentParsingException(longOption);
 
 						String value = args[++i];
 						if (listener != null)
@@ -144,18 +155,14 @@ public class CliOptions {
 						Option o = shortOptionsMap.get(Character
 								.toString(shortOption));
 						if (o == null)
-							throw new CliSyntaxException("unknown option "
-									+ shortOption);
+							throw new UnknownOptionParsingException(Character.toString(shortOption));
 
 						if (o.requireValue) {
 							if (args[i].length() != 2)
-								throw new CliSyntaxException("option "
-										+ shortOption + " require value,"
-										+ " can't be set with other options");
+								throw new MixedOptionParsingException(args[i].substring(1));
 
 							if (i == (args.length - 1))
-								throw new CliSyntaxException("option "
-										+ shortOption + " without argument");
+								throw new NoArgumentParsingException(Character.toString(shortOption));
 
 							String value = args[++i];
 							if (listener != null)
@@ -205,7 +212,7 @@ public class CliOptions {
 	}
 
 	protected void putOptionWithArg(Option o, String option, String value,
-			CliOptionsListener listener) throws CliSyntaxException {
+			CliOptionsListener listener) throws ParsingException {
 		if (listener != null)
 			listener.optionWithArg(option, value);
 
@@ -216,8 +223,7 @@ public class CliOptions {
 			optionsValues.put(option, valuesList);
 		} else {
 			if (!o.allowMultipleValues)
-				throw new CliSyntaxException("Multiple value for option "
-						+ option);
+				throw new MultipleOptionValuesException(option);
 
 			valuesList.add(value);
 		}
@@ -230,21 +236,21 @@ public class CliOptions {
 	}
 
 	protected void fillLongOptions(String longOptions[])
-			throws OptionsSyntaxException {
+			throws OptionException {
 		for (String o : longOptions) {
 			boolean requireArg = false;
 			boolean allowMutipleValues = false;
 			if (o.endsWith(":") || o.endsWith("#")) {
 				requireArg = true;
 				if (o.length() == 1) {
-					throw new OptionsSyntaxException(o);
+					throw new LongOptionException(o);
 				}
 				allowMutipleValues = o.endsWith("#");
 				o = o.substring(0, o.length() - 1);
 			}
 			for (char c : o.toCharArray()) {
 				if (!Character.isLetter(c)) {
-					throw new OptionsSyntaxException(o);
+					throw new LongOptionException(o);
 				}
 			}
 			longOptionsMap
@@ -253,7 +259,7 @@ public class CliOptions {
 	}
 
 	protected void parseShortOptionsString(String shortOptions)
-			throws OptionsSyntaxException {
+			throws OptionException {
 
 		Character currOption = null;
 		for (char c : shortOptions.toCharArray()) {
@@ -273,10 +279,10 @@ public class CliOptions {
 					shortOptionsMap.put(optionString, o);
 					currOption = null;
 				} else {
-					throw new OptionsSyntaxException(shortOptions);
+					throw new ShortOptionsException(shortOptions);
 				}
 			} else {
-				throw new OptionsSyntaxException(shortOptions);
+				throw new ShortOptionsException(shortOptions);
 			}
 		}
 		if (currOption != null) {
