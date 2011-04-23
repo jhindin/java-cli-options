@@ -1,10 +1,32 @@
 package clioptions;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+/** CliOptions is a class providing Unix-like CLI options parsing.
+ * 
+ * <p>The class has several constructors, accepting short option descriptor string and long 
+ * options descriptors in different combinations. The short option descriptor string consists
+ * of single-letter options, with optional qualifiers ':' and '#' ':' qualifier indicates option
+ * with argument, the option may appear only once; '#' qualifier indicates option with argument
+ * that may appear several times in the argument list. Options without arguments may appear several 
+ * time in the argument list and can be combined in a singe argument. Argument '--' denotes end of options list.
+ * </p>
+ * <p>
+ * For example, short option descriptor line "abcd:e#" assume that the following command line are legal:<br/>
+ * <pre>-a -b -d foo arg1 arg2
+ *-ab -d foo -e bar1 -e bar2 arg1 arg2
+ *-ab -c -c -d foo -- -arg1 arg2 </pre>
+ *  in the last case, -arg1 is treated as argument and not part of options list.</p>
+ *  <p>Long options can be passed as array or List, in both cases long option is presented as separate 
+ *  entity. The same ':' and '#' qualifiers may be applied to the long option entry.</p> 
+ * 
+ * @author      Joseph Hindin
+ */
 
 public class CliOptions {
 	protected HashMap<String, Option> longOptionsMap = new HashMap<String, Option>();
@@ -13,26 +35,47 @@ public class CliOptions {
 	protected HashSet<String> optionsWithoutValues = new HashSet<String>();
 	protected String remainingArgs[];
 
+	/**
+	 * Class constructor accepting short option descriptor string.
+	 * @throws OptionsSyntaxException
+	 */
+
 	public CliOptions(String shortOptions) throws OptionsSyntaxException {
 		parseShortOptionsString(shortOptions);
 	}
 
+	/**
+	 * Class constructor accepting long options descriptors as array.
+	 * @throws OptionsSyntaxException
+	 */
 	public CliOptions(String longOptions[]) throws OptionsSyntaxException {
 		fillLongOptions(longOptions);
 	}
 
+	/**
+	 * Class constructor accepting long options descriptors as List.
+	 * @throws OptionsSyntaxException
+	 */
 	public CliOptions(List<String> longOptions) throws OptionsSyntaxException {
 		String o[] = new String[longOptions.size()];
 		o = longOptions.toArray(o);
 		fillLongOptions(o);
 	}
 
+	/**
+	 * Class constructor accepting short options descriptor string and long options descriptors as array.
+	 * @throws OptionsSyntaxException
+	 */
 	public CliOptions(String shortOptions, String longOptions[])
 			throws OptionsSyntaxException {
 		parseShortOptionsString(shortOptions);
 		fillLongOptions(longOptions);
 	}
 
+	/**
+	 * Class constructor accepting short options descriptor string and long options descriptors as list.
+	 * @throws OptionsSyntaxException
+	 */
 	public CliOptions(String shortOptions, List<String> longOptions)
 			throws OptionsSyntaxException {
 		parseShortOptionsString(shortOptions);
@@ -42,10 +85,19 @@ public class CliOptions {
 		fillLongOptions(o);
 	}
 
+	/**
+	 * Parsing command line; encountered options are accumulated internally for later querying.
+	 * @throws CliSyntaxException
+	 */
 	public void parse(String args[]) throws CliSyntaxException {
 		parse(args, null);
 	}
 
+	/**
+	 * Parsing command line; encountered options are accumulated internally for later querying, with
+	 * listener. One of CliOptionsListener methods is invoked on each successfully recognized option.
+	 * @throws CliSyntaxException
+	 */
 	public void parse(String args[], CliOptionsListener listener)
 			throws CliSyntaxException {
 
@@ -126,14 +178,18 @@ public class CliOptions {
 		}
 	}
 
+	/** Returns array of remaining arguments. Value valid only after successful parse invocation. */
 	public String[] getRemaningArgs() {
 		return remainingArgs;
 	}
 
+	/** Query whether given options is set. Value valid only after successful parse invocation. */
 	public boolean isOptionSet(String option) {
 		return optionsWithoutValues.contains(option);
 	}
 
+	/** Query value for option with argument. For options with multiple arguments, returns first value.
+	 *  Value valid only after successful parse invocation. */
 	public String getOptionValue(String option) {
 		List<String> values = optionsValues.get(option);
 		if (values == null) {
@@ -143,6 +199,7 @@ public class CliOptions {
 		}
 	}
 
+	/** Query all values for given option. Value valid only after successful parse invocation. */
 	public List<String> getAllOptionValues(String option) {
 		return optionsValues.get(option);
 	}
