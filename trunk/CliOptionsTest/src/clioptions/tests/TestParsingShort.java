@@ -8,12 +8,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+
 import org.junit.Before;
 import org.junit.Test;
 
 import clioptions.CliOptions;
-import clioptions.CliSyntaxException;
-import clioptions.OptionsSyntaxException;
+import clioptions.exceptions.creation.OptionException;
+import clioptions.exceptions.parsing.ParsingException;
 
 
 public  class TestParsingShort {
@@ -56,25 +57,25 @@ public  class TestParsingShort {
 		assertTrue(cliOptions.isOptionSet("a"));
 	}
 
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  OptionDNoVaue()  throws Exception {
 		String args[] = "-d".split(" ");
 		cliOptions.parse(args);
 	}
 
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  optionENoVaue()  throws Exception {
 		String args[] = "-e".split(" ");
 		cliOptions.parse(args);
 	}
 
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  optionEA()  throws Exception {
 		String args[] = "-ae tyu".split(" ");
 		cliOptions.parse(args);
 	}
 
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  optionDMultipleVaues()  throws Exception {
 		String args[] = "-d aaa -d bbb".split(" ");
 		cliOptions.parse(args);
