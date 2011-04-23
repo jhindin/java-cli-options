@@ -8,31 +8,23 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import clioptions.CliOptions;
 import clioptions.CliSyntaxException;
-import clioptions.OptionsSyntaxException;
 
 
-public  class TestParsingShort {
+public abstract class AbstractTestParsingLong {
 	CliOptions cliOptions;
 	
-	@Before
-	public  void setupOptions() throws Exception
-	{
-		cliOptions = new CliOptions("abcd:e#");
-	}
-
 	@Test 
 	public void  simple()  throws Exception {
 		String args[] = "abc def".split(" ");
 		cliOptions.parse(args);
 		String rargs[] = cliOptions.getRemaningArgs();
 		assertArrayEquals(args, rargs);
-		assertFalse(cliOptions.isOptionSet("a"));
-		assertFalse(cliOptions.isOptionSet("z"));
+		assertFalse(cliOptions.isOptionSet("aaa"));
+		assertFalse(cliOptions.isOptionSet("zzz"));
 		assertNull(cliOptions.getOptionValue("z"));
 	}
 
@@ -42,13 +34,13 @@ public  class TestParsingShort {
 		cliOptions.parse(args);
 		String rargs[] = cliOptions.getRemaningArgs();
 		assertArrayEquals("abc def".split(" "), rargs);
-		assertFalse(cliOptions.isOptionSet("a"));
-		assertFalse(cliOptions.isOptionSet("z"));
+		assertFalse(cliOptions.isOptionSet("aaaa"));
+		assertFalse(cliOptions.isOptionSet("zzz"));
 		assertNull(cliOptions.getOptionValue("z"));
 	}
-
+	
 	@Test 
-	public void  singleOption()  throws Exception {
+	public void  singleShortOption()  throws Exception {
 		String args[] = "-a abc def".split(" ");
 		cliOptions.parse(args);
 		String rargs[] = cliOptions.getRemaningArgs();
@@ -56,9 +48,25 @@ public  class TestParsingShort {
 		assertTrue(cliOptions.isOptionSet("a"));
 	}
 
+	@Test 
+	public void  singleLongOption()  throws Exception {
+		String args[] = "--aaa abc def".split(" ");
+		cliOptions.parse(args);
+		String rargs[] = cliOptions.getRemaningArgs();
+		assertArrayEquals("abc def".split(" "), rargs);
+		assertTrue(cliOptions.isOptionSet("aaa"));
+		assertFalse(cliOptions.isOptionSet("a"));
+	}
+	
 	@Test(expected=CliSyntaxException.class)
-	public void  OptionDNoVaue()  throws Exception {
-		String args[] = "-d".split(" ");
+	public void  optionEEENoVaue()  throws Exception {
+		String args[] = "--eee".split(" ");
+		cliOptions.parse(args);
+	}
+
+	@Test(expected=CliSyntaxException.class)
+	public void  optionFFFNoVaue()  throws Exception {
+		String args[] = "--fff".split(" ");
 		cliOptions.parse(args);
 	}
 
@@ -67,30 +75,19 @@ public  class TestParsingShort {
 		String args[] = "-e".split(" ");
 		cliOptions.parse(args);
 	}
-
-	@Test(expected=CliSyntaxException.class)
-	public void  optionEA()  throws Exception {
-		String args[] = "-ae tyu".split(" ");
-		cliOptions.parse(args);
-	}
-
-	@Test(expected=CliSyntaxException.class)
-	public void  optionDMultipleVaues()  throws Exception {
-		String args[] = "-d aaa -d bbb".split(" ");
-		cliOptions.parse(args);
-	}
-
+	
 	@Test 
-	public void  multipleOptionValues()  throws Exception {
-		String args[] = "-a -d asd -e ght -e bnm abc def".split(" ");
+	public void  multipleFFFOptionValues()  throws Exception {
+		String args[] = "-a -f lkj --fff ght --fff bnm -f oiu abc def".split(" ");
 		cliOptions.parse(args);
 		String rargs[] = cliOptions.getRemaningArgs();
 		assertArrayEquals("abc def".split(" "), rargs);
 		assertTrue(cliOptions.isOptionSet("a"));
 		assertFalse(cliOptions.isOptionSet("b"));
-		assertEquals("asd", cliOptions.getOptionValue("d"));
-		assertEquals("ght", cliOptions.getOptionValue("e"));
-		assertEquals(Arrays.asList("ght", "bnm"), cliOptions.getAllOptionValues("e"));
+		assertNull(cliOptions.getOptionValue("d"));
+		assertNull(cliOptions.getOptionValue("e"));
+		assertEquals(Arrays.asList("ght", "bnm"), cliOptions.getAllOptionValues("fff"));
+		assertEquals(Arrays.asList("lkj", "oiu"), cliOptions.getAllOptionValues("f"));
 	}
-
+	
 }
