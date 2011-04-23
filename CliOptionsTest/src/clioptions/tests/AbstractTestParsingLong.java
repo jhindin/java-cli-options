@@ -11,7 +11,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import clioptions.CliOptions;
-import clioptions.CliSyntaxException;
+import clioptions.exceptions.parsing.ParsingException;
 
 
 public abstract class AbstractTestParsingLong {
@@ -58,19 +58,19 @@ public abstract class AbstractTestParsingLong {
 		assertFalse(cliOptions.isOptionSet("a"));
 	}
 	
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  optionEEENoVaue()  throws Exception {
 		String args[] = "--eee".split(" ");
 		cliOptions.parse(args);
 	}
 
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  optionFFFNoVaue()  throws Exception {
 		String args[] = "--fff".split(" ");
 		cliOptions.parse(args);
 	}
 
-	@Test(expected=CliSyntaxException.class)
+	@Test(expected=ParsingException.class)
 	public void  optionENoVaue()  throws Exception {
 		String args[] = "-e".split(" ");
 		cliOptions.parse(args);
