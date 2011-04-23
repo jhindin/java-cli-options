@@ -16,7 +16,6 @@ public class CliOptions {
 	public CliOptions(String shortOptions) throws OptionsSyntaxException
 	{
 		parseShortOptionsString(shortOptions);
-		
 	}
 	
 	public CliOptions(String longOptions[])  throws OptionsSyntaxException {
@@ -47,6 +46,7 @@ public class CliOptions {
 		
 		remainingArgs = null;
 		optionsValues = new HashMap<String, List<String>>();
+		optionsWithoutValues = new HashSet<String>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].charAt(0) == '-') {
@@ -62,7 +62,7 @@ public class CliOptions {
 					String longOption = args[i].substring(2);
 					Option o = longOptionsMap.get(longOption);
 					if (o == null) 
-						throw new CliSyntaxException("unknown option " + o);
+						throw new CliSyntaxException("unknown option " + longOption);
 					
 					if (o.requireValue) {
 						if (i == (args.length - 1))
@@ -72,12 +72,13 @@ public class CliOptions {
 					} else {
 						putOption(longOption);
 					}
-					
-					
 				} else {
 					for (int j = 1; j < args[i].length(); j++) {
-						Character shortOption = args[i].charAt(j);
-						Option o = shortOptionsMap.get(shortOption);
+						char shortOption = args[i].charAt(j);
+						Option o = shortOptionsMap.get(Character.toString(shortOption));
+						if (o==null)
+							throw new CliSyntaxException("unknown option " + shortOption);
+							
 						if (o.requireValue) {
 							if (args[i].length() != 2) 
 								throw new CliSyntaxException("option " + shortOption + " require value," +
@@ -86,10 +87,11 @@ public class CliOptions {
 							if (i == (args.length - 1))
 								throw new CliSyntaxException("option " + shortOption + " without argument");
 							
-							putOptionWithArg(o, Character.toString(shortOption.charValue()), args[++i]);
-
-						} 
-						putOption(Character.toString(shortOption.charValue()));
+							putOptionWithArg(o, Character.toString(shortOption), args[++i]);
+							break;
+						} else { 
+							putOption(Character.toString(shortOption));
+						}
 					}
 				}
 			} else { // no -
@@ -190,6 +192,11 @@ public class CliOptions {
 			} else {
 				throw new OptionsSyntaxException(shortOptions);
 			}
+		}
+		if (currOption != null) {
+			String optionString = Character.toString(currOption.charValue());
+			Option o = new Option(optionString, false, true);
+			shortOptionsMap.put(optionString, o);
 		}
 	}
 }
