@@ -3,7 +3,7 @@ package clioptions.exceptions.parsing;
 public class UnknownOptionParsingException extends ParsingException {
 
 	public UnknownOptionParsingException(String option) {
-		super("Unknown option", option);
+		super("Unknown option " + option, option);
 		// TODO Auto-generated constructor stub
 	}
 

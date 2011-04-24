@@ -1,9 +1,9 @@
 package clioptions.exceptions.creation;
 
 
-public class LongOptionException extends OptionException {
+public class LongOptionError extends OptionError {
 
-	public LongOptionException(String longOption) {
+	public LongOptionError(String longOption) {
 		super("Invalid long options " + longOption,
 				longOption);
 		// TODO Auto-generated constructor stub
