@@ -1,9 +1,9 @@
 package clioptions.exceptions.creation;
 
-public class OptionException extends Exception {
+public class OptionError extends Error {
 	protected String errorCause;
 	
-	public OptionException(String msg, String errorCause) {
+	public OptionError(String msg, String errorCause) {
 		super(msg); 
 	}
 	

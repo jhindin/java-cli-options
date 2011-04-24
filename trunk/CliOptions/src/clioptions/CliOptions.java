@@ -3,13 +3,14 @@ package clioptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import clioptions.exceptions.creation.LongOptionException;
-import clioptions.exceptions.creation.OptionException;
-import clioptions.exceptions.creation.ShortOptionsException;
+import clioptions.exceptions.creation.LongOptionError;
+import clioptions.exceptions.creation.OptionError;
+import clioptions.exceptions.creation.ShortOptionsError;
 import clioptions.exceptions.parsing.MixedOptionParsingException;
 import clioptions.exceptions.parsing.MultipleOptionValuesException;
 import clioptions.exceptions.parsing.NoArgumentParsingException;
@@ -27,16 +28,29 @@ import clioptions.exceptions.parsing.UnknownOptionParsingException;
  * of single-letter options, with optional qualifiers ':' and '#' ':' qualifier indicates option
  * with argument, the option may appear only once; '#' qualifier indicates option with argument
  * that may appear several times in the argument list. Options without arguments may appear several 
- * time in the argument list and can be combined in a singe argument. Argument '--' denotes end of options list.
+ * time in the argument list and can be combined in a single argument. Argument '--' denotes end of options list.
  * </p>
  * <p>
- * For example, short option descriptor line "abcd:e#" assume that the following command line are legal:<br/>
+ * For example, short option descriptor line "abcd:e#" implies that the following command lines are valid:<br/>
  * <pre>-a -b -d foo arg1 arg2
  *-ab -d foo -e bar1 -e bar2 arg1 arg2
  *-ab -c -c -d foo -- -arg1 arg2 </pre>
- *  in the last case, -arg1 is treated as argument and not part of options list.</p>
+ *  in the last case, <tt>-arg1</tt> is treated as argument and not part of options list.</p>
  *  <p>Long options can be passed as array or List, in both cases long option is presented as separate 
  *  entity. The same ':' and '#' qualifiers may be applied to the long option entry.</p> 
+ *  For example, the  long options set <tt>{ "aaa". "bbb", "ccc:", "ddd#"}</tt> implies that the following
+ *  command line is valid:
+ *  <tt>--aaa --bbb --ccc foo --ddd bar1 --ddd bar2 arg1 arg2</tt> 
+ *  -- terminates option parsing both with long and short options. Short and long options can be combined.</p>
+ *  <p> For convenience, long options can be passed as array or Collection<String>. The following two fragments are equivalent:
+ *  <pre>CliOptions options = new CliOptions(Arrays.asList("aaa", "bbb:", "ccc#", "ddd"));</pre>
+ *  and
+ *  <pre>String longOptionsDescription[] = {"aaa", "bbb:", "ccc#", "ddd"};
+ * CliOptions options = new CliOptions(longOptionsDescription);</pre></p>
+ * <p>Syntax errors in option descriptors cause OptionException to be raised from the CliOptions constructors.</p>
+ * 
+ * <p>After CliOptions instance is instantiated, it can be used for parsing the argument list and collecting options values.
+ * The typical 
  * 
  * @author      Joseph Hindin
  */
@@ -50,26 +64,26 @@ public class CliOptions {
 
 	/**
 	 * Class constructor accepting short option descriptor string.
-	 * @throws OptionException
+	 * @throws OptionError
 	 */
 
-	public CliOptions(String shortOptions) throws OptionException {
+	public CliOptions(String shortOptions) throws OptionError {
 		parseShortOptionsString(shortOptions);
 	}
 
 	/**
 	 * Class constructor accepting long options descriptors as array.
-	 * @throws OptionException
+	 * @throws OptionError
 	 */
-	public CliOptions(String longOptions[]) throws OptionException {
+	public CliOptions(String longOptions[]) throws OptionError {
 		fillLongOptions(longOptions);
 	}
 
 	/**
 	 * Class constructor accepting long options descriptors as List.
-	 * @throws OptionException
+	 * @throws OptionError
 	 */
-	public CliOptions(List<String> longOptions) throws OptionException {
+	public CliOptions(Collection<String> longOptions) throws OptionError {
 		String o[] = new String[longOptions.size()];
 		o = longOptions.toArray(o);
 		fillLongOptions(o);
@@ -77,20 +91,20 @@ public class CliOptions {
 
 	/**
 	 * Class constructor accepting short options descriptor string and long options descriptors as array.
-	 * @throws OptionException
+	 * @throws OptionError
 	 */
 	public CliOptions(String shortOptions, String longOptions[])
-			throws OptionException {
+			throws OptionError {
 		parseShortOptionsString(shortOptions);
 		fillLongOptions(longOptions);
 	}
 
 	/**
 	 * Class constructor accepting short options descriptor string and long options descriptors as list.
-	 * @throws OptionException
+	 * @throws OptionError
 	 */
-	public CliOptions(String shortOptions, List<String> longOptions)
-			throws OptionException {
+	public CliOptions(String shortOptions, Collection<String> longOptions)
+			throws OptionError {
 		parseShortOptionsString(shortOptions);
 
 		String o[] = new String[longOptions.size()];
@@ -152,8 +166,7 @@ public class CliOptions {
 				} else {
 					for (int j = 1; j < args[i].length(); j++) {
 						char shortOption = args[i].charAt(j);
-						Option o = shortOptionsMap.get(Character
-								.toString(shortOption));
+						Option o = shortOptionsMap.get(Character.toString(shortOption));
 						if (o == null)
 							throw new UnknownOptionParsingException(Character.toString(shortOption));
 
@@ -183,6 +196,7 @@ public class CliOptions {
 				return;
 			}
 		}
+		remainingArgs = new String[0];
 	}
 
 	/** Returns array of remaining arguments. Value valid only after successful parse invocation. */
@@ -236,21 +250,21 @@ public class CliOptions {
 	}
 
 	protected void fillLongOptions(String longOptions[])
-			throws OptionException {
+			throws OptionError {
 		for (String o : longOptions) {
 			boolean requireArg = false;
 			boolean allowMutipleValues = false;
 			if (o.endsWith(":") || o.endsWith("#")) {
 				requireArg = true;
 				if (o.length() == 1) {
-					throw new LongOptionException(o);
+					throw new LongOptionError(o);
 				}
 				allowMutipleValues = o.endsWith("#");
 				o = o.substring(0, o.length() - 1);
 			}
 			for (char c : o.toCharArray()) {
 				if (!Character.isLetter(c)) {
-					throw new LongOptionException(o);
+					throw new LongOptionError(o);
 				}
 			}
 			longOptionsMap
@@ -259,7 +273,7 @@ public class CliOptions {
 	}
 
 	protected void parseShortOptionsString(String shortOptions)
-			throws OptionException {
+			throws OptionError {
 
 		Character currOption = null;
 		for (char c : shortOptions.toCharArray()) {
@@ -273,16 +287,16 @@ public class CliOptions {
 				currOption = c;
 			} else if (c == ':' || c == '#') {
 				if (currOption != null) {
-					String optionString = Character.toString(currOption
-							.charValue());
+					String optionString = Character.toString
+					(currOption.charValue());
 					Option o = new Option(optionString, true, c == '#');
 					shortOptionsMap.put(optionString, o);
 					currOption = null;
 				} else {
-					throw new ShortOptionsException(shortOptions);
+					throw new ShortOptionsError(shortOptions);
 				}
 			} else {
-				throw new ShortOptionsException(shortOptions);
+				throw new ShortOptionsError(shortOptions);
 			}
 		}
 		if (currOption != null) {

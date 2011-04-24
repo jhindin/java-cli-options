@@ -1,9 +1,9 @@
 package clioptions.exceptions.creation;
 
 
-public class ShortOptionsException extends OptionException {
+public class ShortOptionsError extends OptionError {
 
-	public ShortOptionsException(String shortOptionsDescriptor) {
+	public ShortOptionsError(String shortOptionsDescriptor) {
 		super("Invalid short option descriptor " + shortOptionsDescriptor,
 				shortOptionsDescriptor);
 		// TODO Auto-generated constructor stub
