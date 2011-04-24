@@ -6,7 +6,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import clioptions.CliOptions;
-import clioptions.exceptions.creation.OptionError;
+import clioptions.errors.creation.OptionError;
 
 
 public class TestCreation {
