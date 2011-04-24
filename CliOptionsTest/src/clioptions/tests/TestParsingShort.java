@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import clioptions.CliOptions;
-import clioptions.exceptions.creation.OptionError;
+import clioptions.errors.creation.OptionError;
 import clioptions.exceptions.parsing.ParsingException;
 
 
