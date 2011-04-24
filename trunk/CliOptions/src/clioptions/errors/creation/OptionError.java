@@ -1,4 +1,4 @@
-package clioptions.exceptions.creation;
+package clioptions.errors.creation;
 
 public class OptionError extends Error {
 	protected String errorCause;

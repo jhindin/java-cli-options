@@ -1,5 +1,10 @@
-package clioptions.exceptions.creation;
+package clioptions.errors.creation;
 
+/**
+ * Error thrown when invalid long option description is passed to {@link CliOpions} constructor
+ * @author jhindin
+ *
+ */
 
 public class LongOptionError extends OptionError {
 
