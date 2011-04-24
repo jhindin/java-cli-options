@@ -13,6 +13,7 @@ public class TestCreation {
 	@Test
 	public void creation() throws Exception
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("avd:");
@@ -32,6 +33,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureEndsWithSemicolon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("a;");
@@ -40,6 +42,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureSemicolon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("a;b");
@@ -48,6 +51,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureDoubleColon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("a::");
@@ -56,6 +60,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureStartWithColon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions(":t");
@@ -64,6 +69,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureLongIsColon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("t", Arrays.asList("abc", ":"));
@@ -72,6 +78,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureLongIsSemicolon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("t", Arrays.asList("abc", ";"));
@@ -80,6 +87,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureLongContainsSemicolon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("t", Arrays.asList("abc", "abc;def"));
@@ -88,6 +96,7 @@ public class TestCreation {
 	@Test(expected=OptionError.class)
 	public void creationFailureLongContainsSemicolonEndWithColon() throws Exception 
 	{
+		@SuppressWarnings("unused")
 		CliOptions options;
 		
 		options = new CliOptions("t", Arrays.asList("abc", "abc;def:"));
