@@ -50,8 +50,21 @@ import clioptions.exceptions.parsing.UnknownOptionParsingException;
  * <p>Syntax errors in option descriptors cause OptionException to be raised from the CliOptions constructors.</p>
  * 
  * <p>After CliOptions instance is instantiated, it can be used for parsing the argument list and collecting options values.
- * The typical 
- * 
+ * The typical CliOptions usage is expected to bi similar to the following code:
+ * <pre>CliOptions cliOptions = new CliOptions("ab:c#dh", Arrays.asList("aaa",
+ *  "bbb:", "ccc#", "ddd", "help"));
+ *
+ *try {
+ *  cliOptions.parse(args);
+ *  if (cliOptions.isOptionSet("h") || cliOptions.isOptionSet("help")) {
+ *    usage();
+ *    return;
+ *  }
+ *} catch (ParsingException e) {
+ *  System.err.println(e.getMessage());
+ *  usage();
+ *}
+ *</pre> 
  * @author      Joseph Hindin
  */
 
@@ -154,13 +167,8 @@ public class CliOptions {
 							throw new NoArgumentParsingException(longOption);
 
 						String value = args[++i];
-						if (listener != null)
-							listener.optionWithArg(longOption, value);
-
 						putOptionWithArg(o, longOption, value, listener);
 					} else {
-						if (listener != null)
-							listener.option(longOption);
 						putOption(longOption, listener);
 					}
 				} else {
@@ -178,10 +186,6 @@ public class CliOptions {
 								throw new NoArgumentParsingException(Character.toString(shortOption));
 
 							String value = args[++i];
-							if (listener != null)
-								listener.optionWithArg(Character
-										.toString(shortOption), value);
-
 							putOptionWithArg(o,
 									Character.toString(shortOption), value,
 									listener);

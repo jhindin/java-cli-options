@@ -1,13 +1,17 @@
 package clioptions.errors.creation;
 
 /**
- * Error thrown when invalid long option description is passed to {@link CliOpions} constructor
- * @author jhindin
+ * Error thrown when invalid long option description is passed to {@link clioptions.CliOptions} constructor
+ * @author Joseph Hindin
  *
  */
 
 public class LongOptionError extends OptionError {
 
+	/**
+	 * longOption parameter is passed upward to {@link OptionError} as errorCause
+	 * @param longOption
+	 */
 	public LongOptionError(String longOption) {
 		super("Invalid long options " + longOption,
 				longOption);

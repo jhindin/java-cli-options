@@ -1,5 +1,13 @@
 package clioptions.exceptions.parsing;
 
+/** Exception thrown by {@link clioptions.CliOptions} parser when short option
+ * requiring argument is encountered in single argument with other options.
+ * 
+ * Problematic option is reported as {@link ParsingException} error cause.
+ * 
+ * @author Joseph Hindin
+ *
+ */
 public class MixedOptionParsingException extends ParsingException {
 
 	public MixedOptionParsingException(String errorCause) {

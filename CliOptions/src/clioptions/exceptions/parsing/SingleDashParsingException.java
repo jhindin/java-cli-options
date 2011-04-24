@@ -1,5 +1,12 @@
 package clioptions.exceptions.parsing;
 
+/**
+ * Exception thrown by {@link clioptions.CliOptions} parser when single '-' is found 
+ * The exception put empty string as error cause of {@link ParsingException}
+ * 
+ * @author Joseph Hindin
+ *
+ */
 
 public class SingleDashParsingException extends ParsingException {
 
