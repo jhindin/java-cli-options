@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import clioptions.exceptions.creation.LongOptionError;
-import clioptions.exceptions.creation.OptionError;
-import clioptions.exceptions.creation.ShortOptionsError;
+import clioptions.errors.creation.LongOptionError;
+import clioptions.errors.creation.OptionError;
+import clioptions.errors.creation.ShortOptionsError;
 import clioptions.exceptions.parsing.MixedOptionParsingException;
 import clioptions.exceptions.parsing.MultipleOptionValuesException;
 import clioptions.exceptions.parsing.NoArgumentParsingException;
