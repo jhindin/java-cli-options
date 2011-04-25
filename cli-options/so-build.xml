@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project  basedir=".">
+
+  <property name="src" location="src"/>
+  <property name="build" location="so-build"/>
+  <property name="dist"  location="so-dist"/>
+
+  <property name="demos"  location="demos"/>
+  <property name="demos.build"  location="so-demos.build"/>
+  <property name="version" value="0.1"/>
+  <property name="project.jar" location="${dist}/${ant.project.name}-${version}.jar"/>
+  <property name="example.jar" location="${dist}/${ant.project.name}-example-${version}.jar"/>
+
+
+  <target name="default" depends="build"/>
+
+  <target name="build" depends="jar, javadoc"/>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="${dist}"/>
+    <jar jarfile="${project.jar}" basedir="${build}"/>
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${build}"/>
+    <javac srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${demos.build}"/>
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+
+  <target name="javadoc">
+    <javadoc sourcepath="${src}" destdir="${dist}/javadocs" link="http://download.oracle.com/javase/6/docs/api"/>
+  </target>
+
+  <target name="example" depends="example.compile, example.jar"/>
+  
+  <target name="example.compile" depends="jar">
+    <mkdir dir="${demos.build}"/>
+    <javac srcdir="${demos}" destdir="${demos.build}" classpath="${project.jar}"/>
+  </target>
+
+  <target name="example.jar">
+    <jar jarfile="${example.jar}" manifest="${demos}/example/MANIFEST.MF">
+      <fileset dir="${build}"/>
+      <fileset dir="${demos.build}"/>
+    </jar>
+  </target>
+
+
+
+
+</project>
